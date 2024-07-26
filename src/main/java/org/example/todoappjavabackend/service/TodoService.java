@@ -18,8 +18,7 @@ public class TodoService {
     public Todo saveNewTodo(NewTodoDto todoDto) {
         Todo todoToSave = new Todo(
                 UUID.randomUUID().toString(),
-                todoDto.todo(),
-                todoDto.description()
+                todoDto.todo()
         );
         return todoRepo.save(todoToSave);
     }
