@@ -1,7 +1,9 @@
 package org.example.todoappjavabackend.dto;
 
+import org.example.todoappjavabackend.model.TodoStatus;
+
 public record NewTodoDto(
         int todoNumber,
-        String todo
-) {
+        String description,
+        TodoStatus status) {
 }

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("todos")
 public record Todo(
         @Id String id,
-        String todo
+        String description,
+        TodoStatus status
 ) {
 }
