@@ -24,4 +24,8 @@ public class TodoController {
     public List<Todo> getAllTodos() {
         return todoService.retrieveAllTodos();
     }
+
+    /* TODO: check endpoints again
+       `/api/todo` -> only todos? or other status as well?
+    */
 }

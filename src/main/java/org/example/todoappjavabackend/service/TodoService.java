@@ -26,8 +26,7 @@ public class TodoService {
     }
 
     public List<Todo> retrieveAllTodos() {
-        List<Todo> todos = todoRepo.findAll();
-        return todos;
+        return todoRepo.findAll();
     }
 
 }
