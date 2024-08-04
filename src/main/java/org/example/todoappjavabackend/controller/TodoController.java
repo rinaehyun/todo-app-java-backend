@@ -39,7 +39,8 @@ public class TodoController {
         return todoService.updateTodoById(id, updateTodoDto);
     }
 
-    /* TODO: check endpoints again
-       `/api/todo` -> only todos? or other status as well?
-    */
+    @DeleteMapping("/todo/{id}")
+    public void deleteTodo(@PathVariable String id) {
+        todoService.deleteTodoById(id);
+    }
 }

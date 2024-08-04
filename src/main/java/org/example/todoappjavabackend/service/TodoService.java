@@ -45,4 +45,8 @@ public class TodoService {
                         return todoRepo.save(updatedTodo);
                     });
     }
+
+    public void deleteTodoById(String id) {
+        todoRepo.deleteById(id);
+    }
 }
