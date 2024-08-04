@@ -2,11 +2,13 @@ package org.example.todoappjavabackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todoappjavabackend.dto.NewTodoDto;
+import org.example.todoappjavabackend.dto.UpdateTodoDto;
 import org.example.todoappjavabackend.model.Todo;
 import org.example.todoappjavabackend.service.TodoService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -25,7 +27,20 @@ public class TodoController {
         return todoService.retrieveAllTodos();
     }
 
-    /* TODO: check endpoints again
-       `/api/todo` -> only todos? or other status as well?
-    */
+    @GetMapping("/todo/{id}")
+    public Optional<Todo> getTodoById(@PathVariable String id) {
+        return todoService.retrieveTodoById(id);
+    }
+
+    @PutMapping("/todo/{id}")
+    public Optional<Todo> updateTodo(
+            @PathVariable String id,
+            @RequestBody UpdateTodoDto updateTodoDto) {
+        return todoService.updateTodoById(id, updateTodoDto);
+    }
+
+    @DeleteMapping("/todo/{id}")
+    public void deleteTodo(@PathVariable String id) {
+        todoService.deleteTodoById(id);
+    }
 }
