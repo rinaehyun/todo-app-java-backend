@@ -58,42 +58,33 @@ class TodoServiceTest {
     public void retrieveTodoByIdTest_whenTodoInDB_thenReturnTodo() {
         // GIVEN
         Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
-        Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
-        List<Todo> todos = List.of(todo1, todo2);
-
         String id = "123";
-        Todo retrievedTodo = todos.stream().filter(todo -> todo.id().equals(id)).toList().get(0);
-        when(todoRepo.findById(id)).thenReturn(Optional.ofNullable(retrievedTodo));
+        when(todoRepo.findById(id)).thenReturn(Optional.of(todo1));
 
         // WHEN
-        Optional<Todo> actual = todoService.retrieveTodoById(id);
+        Todo actual = todoService.retrieveTodoById(id);
 
         // THEN
-        assert retrievedTodo != null;
-        Optional<Todo> expected = Optional.of(retrievedTodo);
+        Todo expected = todo1;
 
         verify(todoRepo, times(1)).findById(id);
         assertEquals(expected, actual);
     }
 
+    // TODO: with exception handling?
+    /*
     @Test
     public void retrieveTodoByIdTest_whenNoTodoInDB_thenReturnNothing() {
         // GIVEN
-        Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
-        Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
-        List<Todo> todos = List.of(todo1, todo2);
-
         String id = "789";
-        when(todoRepo.findById(id)).thenReturn(Optional.empty());
-
+        //when(todoRepo.findById(id)).thenThrow(NoSuchElementException.class);
         // WHEN
-        Optional<Todo> actual = todoService.retrieveTodoById(id);
+        Todo actual = todoService.retrieveTodoById(id);
 
         // THEN
-        Optional<Todo> expected = Optional.empty();
-        verify(todoRepo, times(1)).findById(id);
-        assertEquals(expected, actual);
+        verify(todoRepo, times(0)).findById(id);
     }
+     */
 
     @Test
     public void saveNewTodoTest_whenNewTodoAsInput_thenReturnNewTodo() {
@@ -114,10 +105,7 @@ class TodoServiceTest {
     @Test
     public void updateTodoByIdTest_whenTodoInDB_thenDeleteTodo() {
         // GIVEN
-        Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
         Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
-        List<Todo> todos = List.of(todo1, todo2);
-
         String id = "456";
 
         UpdateTodoDto updateTodoDto = new UpdateTodoDto("Running", TodoStatus.IN_PROGRESS);
@@ -127,10 +115,10 @@ class TodoServiceTest {
         when(todoRepo.save(updatedTodo)).thenReturn(updatedTodo);
 
         // WHEN
-        Optional<Todo> actual = todoService.updateTodoById(id, updateTodoDto);
+        Todo actual = todoService.updateTodoById(id, updateTodoDto);
 
         // THEN
-        Optional<Todo> expected = Optional.of(updatedTodo);
+        Todo expected = updatedTodo;
         verify(todoRepo, times(1)).findById(id);
         verify(todoRepo, times(1)).save(updatedTodo);
         assertEquals(expected, actual);

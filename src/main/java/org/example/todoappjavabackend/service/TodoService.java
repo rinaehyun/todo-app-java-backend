@@ -31,11 +31,11 @@ public class TodoService {
         return todoRepo.findAll();
     }
 
-    public Optional<Todo> retrieveTodoById(String id) {
-        return todoRepo.findById(id);
+    public Todo retrieveTodoById(String id) {
+        return todoRepo.findById(id).orElseThrow();
     }
 
-    public Optional<Todo> updateTodoById(String id, UpdateTodoDto updateTodoDto) {
+    public Todo updateTodoById(String id, UpdateTodoDto updateTodoDto) {
         return todoRepo.findById(id)
                     .map(todo -> {
                         Todo updatedTodo = todo;
@@ -43,7 +43,7 @@ public class TodoService {
                         updatedTodo = updatedTodo.withDescription(updateTodoDto.description());
                         updatedTodo = updatedTodo.withStatus(updateTodoDto.status());
                         return todoRepo.save(updatedTodo);
-                    });
+                    }).orElseThrow();
     }
 
     public void deleteTodoById(String id) {
