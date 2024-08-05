@@ -1,6 +1,7 @@
 package org.example.todoappjavabackend.service;
 
 import org.example.todoappjavabackend.dto.NewTodoDto;
+import org.example.todoappjavabackend.dto.UpdateTodoDto;
 import org.example.todoappjavabackend.model.Todo;
 import org.example.todoappjavabackend.model.TodoStatus;
 import org.example.todoappjavabackend.repository.TodoRepo;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 class TodoServiceTest {
@@ -53,7 +53,7 @@ class TodoServiceTest {
     }
 
     @Test
-    public void retrieveTodoById_whenTodoInDB_thenReturnTodo() {
+    public void retrieveTodoByIdTest_whenTodoInDB_thenReturnTodo() {
         // GIVEN
         Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
         Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
@@ -75,7 +75,7 @@ class TodoServiceTest {
     }
 
     @Test
-    public void retrieveTodoById_whenNoTodoInDB_thenReturnNothing() {
+    public void retrieveTodoByIdTest_whenNoTodoInDB_thenReturnNothing() {
         // GIVEN
         Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
         Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
@@ -94,7 +94,7 @@ class TodoServiceTest {
     }
 
     @Test
-    public void saveNewTodo_whenNewTodoAsInput_thenReturnNewTodo() {
+    public void saveNewTodoTest_whenNewTodoAsInput_thenReturnNewTodo() {
         // GIVEN
         NewTodoDto newTodoDto = new NewTodoDto("Cooking");
         Todo todoToSave = new Todo(idService.randomId(), newTodoDto.description(), TodoStatus.OPEN);
@@ -107,5 +107,38 @@ class TodoServiceTest {
         Todo expected = todoToSave;
         verify(todoRepo, times(1)).save(todoToSave);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void updateTodoByIdTest_whenTodoInDB_thenDeleteTodo() {
+        // GIVEN
+        Todo todo1 = new Todo("123", "Cooking", TodoStatus.OPEN);
+        Todo todo2 = new Todo("456", "Jogging", TodoStatus.DONE);
+        List<Todo> todos = List.of(todo1, todo2);
+
+        String id = "456";
+
+        UpdateTodoDto updateTodoDto = new UpdateTodoDto("Running", TodoStatus.IN_PROGRESS);
+        Todo updatedTodo = new Todo(id, updateTodoDto.description(), updateTodoDto.status());
+
+        when(todoRepo.findById(id)).thenReturn(Optional.of(todo2));
+        when(todoRepo.save(updatedTodo)).thenReturn(updatedTodo);
+
+        // WHEN
+        Optional<Todo> actual = todoService.updateTodoById(id, updateTodoDto);
+
+        // THEN
+        Optional<Todo> expected = Optional.of(updatedTodo);
+        verify(todoRepo, times(1)).findById(id);
+        verify(todoRepo, times(1)).save(updatedTodo);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void deleteTodoByIdTest_whenTodoInDB_thenReturnVoid_DeleteTodo() {
+        String id = "456";
+        doNothing().when(todoRepo).deleteById(id);
+        todoService.deleteTodoById(id);
+        verify(todoRepo, times(1)).deleteById(id);
     }
 }
