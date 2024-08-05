@@ -23,6 +23,8 @@ class TodoServiceTest {
     @Test
     public void retrieveAllTodosTest_whenNoTodosInDB_thenReturnEmptyList() {
         // GIVEN
+        List<Todo> todos = new ArrayList<>();
+        when(todoRepo.findAll()).thenReturn(todos);
 
         // WHEN
         List<Todo> actual = todoService.retrieveAllTodos();
@@ -41,7 +43,7 @@ class TodoServiceTest {
         Todo todo3 = new Todo("789", "Reading", TodoStatus.OPEN);
         List<Todo> todos = List.of(todo1, todo2, todo3);
 
-        when(todoService.retrieveAllTodos()).thenReturn(todos);
+        when(todoRepo.findAll()).thenReturn(todos);
 
         // WHEN
         List<Todo> actual = todoService.retrieveAllTodos();
@@ -61,7 +63,7 @@ class TodoServiceTest {
 
         String id = "123";
         Todo retrievedTodo = todos.stream().filter(todo -> todo.id().equals(id)).toList().get(0);
-        when(todoService.retrieveTodoById(id)).thenReturn(Optional.ofNullable(retrievedTodo));
+        when(todoRepo.findById(id)).thenReturn(Optional.ofNullable(retrievedTodo));
 
         // WHEN
         Optional<Todo> actual = todoService.retrieveTodoById(id);
@@ -82,7 +84,7 @@ class TodoServiceTest {
         List<Todo> todos = List.of(todo1, todo2);
 
         String id = "789";
-        when(todoService.retrieveTodoById(id)).thenReturn(Optional.empty());
+        when(todoRepo.findById(id)).thenReturn(Optional.empty());
 
         // WHEN
         Optional<Todo> actual = todoService.retrieveTodoById(id);
@@ -98,7 +100,7 @@ class TodoServiceTest {
         // GIVEN
         NewTodoDto newTodoDto = new NewTodoDto("Cooking");
         Todo todoToSave = new Todo(idService.randomId(), newTodoDto.description(), TodoStatus.OPEN);
-        when(todoService.saveNewTodo(newTodoDto)).thenReturn(todoToSave);
+        when(todoRepo.save(todoToSave)).thenReturn(todoToSave);
 
         // WHEN
         Todo actual = todoService.saveNewTodo(newTodoDto);
