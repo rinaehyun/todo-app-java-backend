@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TodoService {
 
     private final TodoRepo todoRepo;
+    private final IdService idService;
 
     public Todo saveNewTodo(NewTodoDto todoDto) {
         Todo todoToSave = new Todo(
-                UUID.randomUUID().toString(),
+                idService.randomId(),
                 todoDto.description(),
                 TodoStatus.OPEN
         );

@@ -1,5 +1,6 @@
 package org.example.todoappjavabackend.service;
 
+import org.example.todoappjavabackend.dto.NewTodoDto;
 import org.example.todoappjavabackend.model.Todo;
 import org.example.todoappjavabackend.model.TodoStatus;
 import org.example.todoappjavabackend.repository.TodoRepo;
@@ -11,13 +12,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class TodoServiceTest {
 
     TodoRepo todoRepo = mock(TodoRepo.class);
-    TodoService todoService = new TodoService(todoRepo);
+    IdService idService = mock(IdService.class);
+    TodoService todoService = new TodoService(todoRepo, idService);
 
     @Test
     public void retrieveAllTodosTest_whenNoTodosInDB_thenReturnEmptyList() {
@@ -28,6 +29,7 @@ class TodoServiceTest {
 
         // THEN
         List<Todo> expected = new ArrayList<>();
+        verify(todoRepo, times(1)).findAll();
         assertEquals(expected, actual);
     }
 
@@ -46,6 +48,7 @@ class TodoServiceTest {
 
         // THEN
         List<Todo> expected = List.of(todo1, todo2, todo3);
+        verify(todoRepo, times(1)).findAll();
         assertEquals(expected, actual);
     }
 
@@ -66,6 +69,8 @@ class TodoServiceTest {
         // THEN
         assert retrievedTodo != null;
         Optional<Todo> expected = Optional.of(retrievedTodo);
+
+        verify(todoRepo, times(1)).findById(id);
         assertEquals(expected, actual);
     }
 
@@ -84,6 +89,23 @@ class TodoServiceTest {
 
         // THEN
         Optional<Todo> expected = Optional.empty();
+        verify(todoRepo, times(1)).findById(id);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void saveNewTodo_whenNewTodoAsInput_thenReturnNewTodo() {
+        // GIVEN
+        NewTodoDto newTodoDto = new NewTodoDto("Cooking");
+        Todo todoToSave = new Todo(idService.randomId(), newTodoDto.description(), TodoStatus.OPEN);
+        when(todoService.saveNewTodo(newTodoDto)).thenReturn(todoToSave);
+
+        // WHEN
+        Todo actual = todoService.saveNewTodo(newTodoDto);
+
+        // THEN
+        Todo expected = todoToSave;
+        verify(todoRepo, times(1)).save(todoToSave);
         assertEquals(expected, actual);
     }
 }
