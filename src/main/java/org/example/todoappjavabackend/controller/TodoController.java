@@ -3,11 +3,15 @@ package org.example.todoappjavabackend.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.todoappjavabackend.dto.NewTodoDto;
 import org.example.todoappjavabackend.dto.UpdateTodoDto;
+import org.example.todoappjavabackend.exception.ErrorMessage;
 import org.example.todoappjavabackend.model.Todo;
 import org.example.todoappjavabackend.service.TodoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -28,12 +32,12 @@ public class TodoController {
     }
 
     @GetMapping("/todo/{id}")
-    public Optional<Todo> getTodoById(@PathVariable String id) {
+    public Todo getTodoById(@PathVariable String id) {
         return todoService.retrieveTodoById(id);
     }
 
     @PutMapping("/todo/{id}")
-    public Optional<Todo> updateTodo(
+    public Todo updateTodo(
             @PathVariable String id,
             @RequestBody UpdateTodoDto updateTodoDto) {
         return todoService.updateTodoById(id, updateTodoDto);
