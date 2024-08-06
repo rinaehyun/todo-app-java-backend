@@ -10,8 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,7 +47,7 @@ public class TodoIntegrationTest {
     void getAllTodosTest_whenRepoHasTodos_thenReturnAllTodos() {
         // GIVEN
         todoRepo.save(new Todo("123", "Cooking", TodoStatus.OPEN));
-        todoRepo.save(new Todo("456", "Jogging", TodoStatus.OPEN));
+        todoRepo.save(new Todo("456", "Jogging", TodoStatus.IN_PROGRESS));
 
         try {
             // WHEN
@@ -60,12 +64,44 @@ public class TodoIntegrationTest {
                          {
                            "id": "456",
                            "description": "Jogging",
-                           "status": "OPEN"
+                           "status": "IN_PROGRESS"
                          }
                        ]
                      """));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Test
+    @DirtiesContext
+    void getTodoByIdTest_whenTodoWithIdExists_thenReturnTodo() throws Exception {
+        // GIVEN
+        todoRepo.save(new Todo("123", "Cooking", TodoStatus.IN_PROGRESS));
+
+        // WHEN
+        mockMvc.perform(get("/api/todo/123"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                   {
+                     "id": "123",
+                     "description": "Cooking",
+                     "status": "IN_PROGRESS"
+                   }
+                 """));
+    }
+
+    @Test
+    @DirtiesContext
+    void getTodoByIdTest_whenTodoWithIdDoesNotExist_thenThrowErrorMessage() throws Exception {
+        // GIVEN
+        todoRepo.save(new Todo("123", "Cooking", TodoStatus.IN_PROGRESS));
+
+        // WHEN
+        mockMvc.perform(get("/api/todo/456"))
+                // THEN
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NoSuchElementException))
+                .andExpect(result -> assertEquals("No value present", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 }
