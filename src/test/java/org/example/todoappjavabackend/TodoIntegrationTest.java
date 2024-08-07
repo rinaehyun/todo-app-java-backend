@@ -154,6 +154,54 @@ public class TodoIntegrationTest {
                 .andExpect(content().json("[]"));
     }
 
+    @Test
+    @DirtiesContext
+    void updateTodoByIdTest_whenTodoInDBExists_thenUpdateTodo() throws Exception {
+        // GIVEN
+        todoRepo.save(new Todo("123", "Cooking", TodoStatus.DONE));
+
+        // WHEN
+        mockMvc.perform(put("/api/todo/123")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "description": "Cooking dinner",
+                      "status": "IN_PROGRESS"
+                    }
+                 """))
+                // THEN
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                   {
+                     "id": "123",
+                     "description": "Cooking dinner",
+                     "status": "IN_PROGRESS"
+                   }
+                """));
+    }
+
+    @Test
+    @DirtiesContext
+    void updateTodoByIdTest_whenTodoInDBDoesNotExist_thenThrowErrorMessage() throws Exception {
+        // GIVEN
+        todoRepo.save(new Todo("123", "Cooking", TodoStatus.DONE));
+
+        // WHEN
+        mockMvc.perform(put("/api/todo/456")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "description": "Cooking dinner",
+                      "status": "IN_PROGRESS"
+                    }
+                 """))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NoSuchElementException))
+                .andExpect(result -> assertEquals("No value present", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+    }
+
     // TODO: refactor?
     // TODO: mockMvc -> endpoints -> communicate to Repo?
     // TODO: Test align with frontend scenarios? (or dev?)
