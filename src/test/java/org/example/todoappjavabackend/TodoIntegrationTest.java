@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -17,8 +17,9 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,7 +35,7 @@ public class TodoIntegrationTest {
     @DirtiesContext
     void getAllTodosTest_whenRepoIsEmpty_thenReturnEmptyList() {
         try {
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/todo"))
+            mockMvc.perform(get("/api/todo"))
                     .andExpect(status().isOk())
                     .andExpect(content().json("[]"));
         } catch (Exception e) {
@@ -104,4 +105,33 @@ public class TodoIntegrationTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof NoSuchElementException))
                 .andExpect(result -> assertEquals("No value present", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
+
+    @Test
+    @DirtiesContext
+    void saveTodoTest_whenNewTodoExists_thenReturnNewTodoWithRandomIdAndOpenStatus() throws Exception {
+        // GIVEN
+
+        // WHEN
+        mockMvc.perform(post("/api/todo")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "description": "Cooking"
+                    }
+                 """))
+                // THEN
+                .andDo(print())
+                .andExpect(status().isOk())
+                /*.andExpect(content().json("""
+                   {
+                     "id": "123",
+                     "description": "Cooking",
+                     "status": "OPEN"
+                   }
+                """))*/
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.description").value("Cooking"))
+                .andExpect(jsonPath("$.status").value("OPEN"));
+    }
+
 }
