@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TodoService {
 
     private final TodoRepo todoRepo;
+    private final IdService idService;
 
     public Todo saveNewTodo(NewTodoDto todoDto) {
         Todo todoToSave = new Todo(
-                UUID.randomUUID().toString(),
+                idService.randomId(),
                 todoDto.description(),
                 TodoStatus.OPEN
         );
@@ -31,11 +31,11 @@ public class TodoService {
         return todoRepo.findAll();
     }
 
-    public Optional<Todo> retrieveTodoById(String id) {
-        return todoRepo.findById(id);
+    public Todo retrieveTodoById(String id) {
+        return todoRepo.findById(id).orElseThrow();
     }
 
-    public Optional<Todo> updateTodoById(String id, UpdateTodoDto updateTodoDto) {
+    public Todo updateTodoById(String id, UpdateTodoDto updateTodoDto) {
         return todoRepo.findById(id)
                     .map(todo -> {
                         Todo updatedTodo = todo;
@@ -43,7 +43,7 @@ public class TodoService {
                         updatedTodo = updatedTodo.withDescription(updateTodoDto.description());
                         updatedTodo = updatedTodo.withStatus(updateTodoDto.status());
                         return todoRepo.save(updatedTodo);
-                    });
+                    }).orElseThrow();
     }
 
     public void deleteTodoById(String id) {
