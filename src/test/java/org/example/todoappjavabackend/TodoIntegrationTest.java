@@ -49,7 +49,6 @@ public class TodoIntegrationTest {
         todoRepo.save(new Todo("123", "Cooking", TodoStatus.OPEN));
         todoRepo.save(new Todo("456", "Jogging", TodoStatus.IN_PROGRESS));
 
-        // TODO: check try / catch can be used instead of throws Exception
         try {
             // WHEN
             mockMvc.perform(get("/api/todo"))
@@ -102,7 +101,6 @@ public class TodoIntegrationTest {
         mockMvc.perform(get("/api/todo/456"))
                 // THEN
                 .andExpect(status().isNotFound())
-                // TODO: check the test with throw error
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof NoSuchElementException))
                 .andExpect(result -> assertEquals("No value present", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
@@ -123,7 +121,6 @@ public class TodoIntegrationTest {
                 // THEN
                 .andDo(print())
                 .andExpect(status().isOk())
-                // TODO: confirm .andExpect(content().json()) can be replaced with .andExpect(jsonPath().value))
                 // TODO: uuid?
                 .andExpect(content().json("""
                    {
@@ -142,13 +139,24 @@ public class TodoIntegrationTest {
         // GIVEN
         todoRepo.save(new Todo("123", "Cooking", TodoStatus.DONE));
 
+        mockMvc.perform(get("/api/todo"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                  [
+                    {
+                      "id": "123",
+                      "description": "Cooking",
+                      "status": "DONE"
+                    }
+                  ]
+                """));
+
         // WHEN
         mockMvc.perform(delete("/api/todo/123"))
                 // THEN
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        // TODO: check if another method can be used in this case
         mockMvc.perform(get("/api/todo"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
@@ -201,8 +209,4 @@ public class TodoIntegrationTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof NoSuchElementException))
                 .andExpect(result -> assertEquals("No value present", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
-
-    // TODO: refactor?
-    // TODO: mockMvc -> endpoints -> communicate to Repo?
-    // TODO: Test align with frontend scenarios? (or dev?)
 }
