@@ -27,6 +27,9 @@
         <url/>
     </scm>
     <properties>
+        <sonar.organization>rinaehyun</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectName>rinaehyun_todo-app-java-backend</sonar.projectName>
         <java.version>22</java.version>
     </properties>
     <dependencies>
