@@ -16,9 +16,9 @@ import static org.mockito.Mockito.*;
 
 class TodoServiceTest {
 
-    TodoRepo todoRepo = mock(TodoRepo.class);
-    IdService idService = mock(IdService.class);
-    TodoService todoService = new TodoService(todoRepo, idService);
+    private final TodoRepo todoRepo = mock(TodoRepo.class);
+    private final IdService idService = mock(IdService.class);
+    private final TodoService todoService = new TodoService(todoRepo, idService);
 
     @Test
     public void retrieveAllTodosTest_whenNoTodosInDB_thenReturnEmptyList() {
